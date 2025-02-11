@@ -1,0 +1,6 @@
+@InvoiceEntry_HostAddress = http://localhost:5217
+
+GET {{InvoiceEntry_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

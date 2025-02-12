@@ -16,7 +16,7 @@ namespace InvoiceEntry.Controllers
             _context = context;
         }
 
-        // ✅ Get records for a selected date
+        
         [HttpGet("{year}/{month}")]
         public async Task<IActionResult> GetRecords(int year, int month)
         {
@@ -28,7 +28,6 @@ namespace InvoiceEntry.Controllers
             return Ok(records);
         }
 
-        // ✅ Create a single record (not used for bulk insert)
         [HttpPost]
         public async Task<IActionResult> CreateRecord([FromBody] Record record)
         {
@@ -41,31 +40,27 @@ namespace InvoiceEntry.Controllers
             return Ok(new { Message = "Record added successfully!" });
         }
 
-        // ✅ Create 10 records with format CSYYYYMM01 - CSYYYYMM10
         [HttpPost("bulk")]
         public async Task<IActionResult> CreateBulkRecords([FromBody] string selectedDate)
         {
             if (string.IsNullOrEmpty(selectedDate))
                 return BadRequest("Invalid date.");
 
-            // Parse the selected date
-            DateTime date = DateTime.Parse(selectedDate, null, System.Globalization.DateTimeStyles.AdjustToUniversal);
+            DateTime date = DateTime.ParseExact(selectedDate, "yyyy-MM-dd", null);
 
-            // Generate InvoiceNo prefix "CSYYYYMM"
+
             string invoicePrefix = $"CS{date.Year}{date.Month:D2}";
 
             var records = new List<Record>();
 
-            // Generate 10 records with suffix 01 - 10
             for (int i = 1; i <= 10; i++)
             {
                 records.Add(new Record
                 {
-                    InvoiceNo = $"{invoicePrefix}{i:D2}"  // Format "CSYYYYMM01" to "CSYYYYMM10"
+                    InvoiceNo = $"{invoicePrefix}{i:D2}"  
                 });
             }
 
-            // Save records to the database
             await _context.Records.AddRangeAsync(records);
             await _context.SaveChangesAsync();
 
